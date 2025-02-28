@@ -1,0 +1,73 @@
+#import pandas for dataset retreival 
+import pandas as pd 
+import sqlalchemy as sal
+import psycopg2 as pg
+import psycopg2.extras as extras
+
+#inserts every row of datafram into an existing table in postgresql
+def execute_values(conn, df, table): 
+  #converts each row into a tuple
+    tuples = [tuple(x) for x in df.to_numpy()] 
+  
+    cols = ','.join(list(df.columns)) 
+    # SQL query to execute 
+    query = "INSERT INTO %s(%s) VALUES %%s" % (table, cols) 
+    cursor = conn.cursor() 
+    try: 
+        extras.execute_values(cursor, query, tuples) 
+        conn.commit() 
+    except (Exception) as error: 
+        print("Error: %s" % error) 
+        conn.rollback() 
+        cursor.close() 
+        return 1
+    print("the dataframe is inserted") 
+    cursor.close() 
+
+#use pandas to read the csv file and store it in a dataframe
+#also replace the 'Not Available' and 'unknown' values with NULL values
+df = pd.read_csv('orders.csv', na_values = ['Not Available', 'unknown'])
+
+#takes the unique records of a column 
+#print(df['Ship Mode'].unique())
+
+#takes the first 4 rows of a table and the column heads  
+#print(df.head(5))
+
+#sets each column to lowercase
+df.columns = df.columns.str.lower()
+#replaces spaces with underscores
+df.columns = df.columns.str.replace(' ', '_')
+
+#creating sets of derived columns
+df['discount'] = df['list_price'] * df['discount_percent'] *0.01
+df['sale_price'] = df['list_price'] - df['discount']
+df['profit'] = df['sale_price'] - df['cost_price']
+
+#changes datatype of order_date to datetime
+df['order_date'] = pd.to_datetime(df['order_date'], format="%Y-%m-%d")
+
+#disaplays the datatype of each column
+#print(df.dtypes)
+
+#drops columns that are not needed but are still in the table
+df.drop(columns=['list_price', 'cost_price', 'discount_percent'], inplace=True)
+
+#establihs connection with posgresql database
+conn = pg.connect(host='detpgsqldev01.onemagnify.corp', database ='common',user ='kqure', password ='JdI7_m6p1D_2', port='5432')
+
+#cursor variable to execute sql queries
+cursor = conn.cursor()
+
+#remove all records from df_orders table
+cursor.execute('truncate table df_orders')
+
+#inserts the dataframe into the df_orders table
+execute_values(conn, df, 'df_orders')
+
+#cursor.execute('CREATE TABLE df_orders (order_id INT, order_date DATE, ship_mode VARCHAR(50), customer_id INT, product_id INT, sales INT, discount INT, sales_price INT, profit INT)')
+cursor.execute('select * from df_orders')
+
+#fetches the first row of the table on python
+result = cursor.fetchone();
+print(result)
