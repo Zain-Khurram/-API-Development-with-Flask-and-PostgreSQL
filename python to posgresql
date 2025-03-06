@@ -71,3 +71,5 @@ cursor.execute('select * from df_orders')
 #fetches the first row of the table on python
 result = cursor.fetchone();
 print(result)
+
+print('hello worlds')
