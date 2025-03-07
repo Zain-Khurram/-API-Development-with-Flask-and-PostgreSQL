@@ -1,10 +1,9 @@
 #import pandas for dataset retreival 
-import pandas as pd 
-import sqlalchemy as sal
+import pandas as pd
 import psycopg2 as pg
 import psycopg2.extras as extras
 
-#inserts every row of datafram into an existing table in postgresql
+#inserts every row of dataframe into an existing table in postgresql
 def execute_values(conn, df, table): 
   #converts each row into a tuple
     tuples = [tuple(x) for x in df.to_numpy()] 
@@ -26,7 +25,7 @@ def execute_values(conn, df, table):
 
 #use pandas to read the csv file and store it in a dataframe
 #also replace the 'Not Available' and 'unknown' values with NULL values
-df = pd.read_csv('orders.csv', na_values = ['Not Available', 'unknown'])
+df = pd.read_csv('.\\archive\\orders.csv', na_values = ['Not Available', 'unknown'])
 
 #takes the unique records of a column 
 #print(df['Ship Mode'].unique())
@@ -47,29 +46,44 @@ df['profit'] = df['sale_price'] - df['cost_price']
 #changes datatype of order_date to datetime
 df['order_date'] = pd.to_datetime(df['order_date'], format="%Y-%m-%d")
 
-#disaplays the datatype of each column
-#print(df.dtypes)
 
 #drops columns that are not needed but are still in the table
 df.drop(columns=['list_price', 'cost_price', 'discount_percent'], inplace=True)
 
-#establihs connection with posgresql database
-conn = pg.connect(host='detpgsqldev01.onemagnify.corp', database ='common',user ='kqure', password ='JdI7_m6p1D_2', port='5432')
+#disaplays the datatype of each column
+#print(df.dtypes)
 
+#establish connection with posgresql database
+#conn = pg.connect(host='detpgsqldev01.onemagnify.corp', database ='common',user ='kqure', password ='JdI7_m6p1D_2', port='5432')
+conn = pg.connect(host='localhost', database = 'postgres', user = 'postgres', password = 'anwar103', port = '5432')
 #cursor variable to execute sql queries
 cursor = conn.cursor()
 
-#remove all records from df_orders table
-cursor.execute('truncate table df_orders')
+#function that checks true or false if a table exists in the database
+def table_exists_psycopg2(conn, table_name):
+    """Checks if a table exists in a PostgreSQL database using psycopg2."""
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = %s)", (table_name,))
+        return cur.fetchone()[0]
+    except pg.Error as e:
+        print(f"Error checking table existence: {e}")
+        return False
+    finally:
+        if cur:
+            cur.close()
+
+#if function is true then truncate the table if false then create the table
+if table_exists_psycopg2(conn, 'df_orders') == True:
+    cursor.execute('truncate table df_orders')
+elif table_exists_psycopg2(conn, 'df_orders') == False:
+    cursor.execute('CREATE TABLE df_orders (order_id INT, order_date DATE, ship_mode VARCHAR(255), segment VARCHAR(255), country VARCHAR(255), city VARCHAR(255), state VARCHAR(255), postal_code INT, region VARCHAR(255), category VARCHAR(255), sub_category VARCHAR(255), product_id VARCHAR(255), quantity INT, discount FLOAT, sale_price FLOAT, profit FLOAT)')
 
 #inserts the dataframe into the df_orders table
 execute_values(conn, df, 'df_orders')
 
-#cursor.execute('CREATE TABLE df_orders (order_id INT, order_date DATE, ship_mode VARCHAR(50), customer_id INT, product_id INT, sales INT, discount INT, sales_price INT, profit INT)')
 cursor.execute('select * from df_orders')
 
 #fetches the first row of the table on python
 result = cursor.fetchone();
 print(result)
-
-print('hello worlds')
