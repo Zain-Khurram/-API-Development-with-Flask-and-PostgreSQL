@@ -23,9 +23,11 @@ def execute_values(conn, df, table):
     print("the dataframe is inserted") 
     cursor.close() 
 
+csv_location = '.\\archive\\orders.csv'
+
 #use pandas to read the csv file and store it in a dataframe
 #also replace the 'Not Available' and 'unknown' values with NULL values
-df = pd.read_csv('.\\archive\\orders.csv', na_values = ['Not Available', 'unknown'])
+df = pd.read_csv(csv_location, na_values = ['Not Available', 'unknown'])
 
 #takes the unique records of a column 
 #print(df['Ship Mode'].unique())
