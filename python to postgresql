@@ -5,7 +5,7 @@ import psycopg2 as pg
 import psycopg2.extras as extras
 
 # location of the csv file
-csv_location = 'C:\\Users\\mini\\Desktop\\vscode_python\\Python-Project\\archive\\orders.csv'
+csv_location = os.getenv('CSV_FILE_PATH')
 
 # use pandas to read the location of the csv file and then store as the a dataframe
 # also replace the 'Not Available' and 'unknown' values with NULL values
@@ -30,7 +30,12 @@ df['order_date'] = pd.to_datetime(df['order_date'], format="%Y-%m-%d")
 df.drop(columns=['list_price', 'cost_price', 'discount_percent'], inplace=True)
 
 #create a connection varaible with connection parameters to be used when establoshing a connection with posgresql database
-conn = pg.connect(host='localhost', database = 'postgres', user = 'postgres', password = 'anwar103', port = '5432')
+conn = pg.connect(
+    host=os.getenv('DB_HOST', 'localhost'),
+    database=os.getenv('DB_NAME', 'postgres'),
+    user=os.getenv('DB_USER', 'postgres'),
+    password=os.getenv('DB_PASSWORD'),
+    port=os.getenv('DB_PORT', '5432')
 #cursor object to execute sql queries
 cursor = conn.cursor()
 
