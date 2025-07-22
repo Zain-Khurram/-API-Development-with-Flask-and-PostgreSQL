@@ -1,4 +1,4 @@
-# Data-Cleanup with Python and Postgresql
+# -API-Development-with-Flask-and-PostgreSQL
 
 This script loads data from a CSV file into a PostgreSQL database table. It performs several data cleaning and transformation steps before inserting the data.
 
