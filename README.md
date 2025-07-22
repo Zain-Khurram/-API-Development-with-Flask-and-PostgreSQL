@@ -39,18 +39,12 @@ Before running the scripts, ensure you have the following installed:
 **Environment Variables**
 Both scripts rely on environment variables for sensitive information (like database credentials) and file paths. Set the following variables in your environment (e.g., in a .env file and loaded with python-dotenv, or directly in your shell):
 
-CSV_FILE_PATH: The absolute path to your order CSV file (e.g., /path/to/your_data.csv).
-
-DB_HOST: Your PostgreSQL database host (e.g., localhost).
-
-DB_NAME: Your PostgreSQL database name (e.g., postgres).
-
-DB_USER: Your PostgreSQL database username.
-
-DB_PASSWORD: Your PostgreSQL database password.
-
-DB_PORT: Your PostgreSQL database port (default: 5432).
-
+ - CSV_FILE_PATH: The absolute path to your order CSV file (e.g., /path/to/your_data.csv).
+ - DB_HOST: Your PostgreSQL database host (e.g., localhost).
+ - DB_NAME: Your PostgreSQL database name (e.g., postgres).
+ - DB_USER: Your PostgreSQL database username.
+ - DB_PASSWORD: Your PostgreSQL database password.
+ - DB_PORT: Your PostgreSQL database port (default: 5432).
 
 Example (for Linux/macOS):
 ```Bash
