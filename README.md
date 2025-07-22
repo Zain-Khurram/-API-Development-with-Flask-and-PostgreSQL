@@ -1,4 +1,4 @@
-# -API-Development-with-Flask-and-PostgreSQL
+# API-Development-with-Flask-and-PostgreSQL
 
 This repository contains a Python-based solution for extracting, transforming, and loading (ETL) order data into a PostgreSQL database, and then exposing that data through a RESTful API built with Flask.
 
