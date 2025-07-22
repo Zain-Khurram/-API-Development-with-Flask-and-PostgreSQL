@@ -1,4 +1,4 @@
-# Python to PostgreSQL Data Cleanup
+# Data-Cleanup with Python and Postgresql
 
 This script loads data from a CSV file into a PostgreSQL database table. It performs several data cleaning and transformation steps before inserting the data.
 
